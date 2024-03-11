@@ -21,6 +21,7 @@ export function mapToInternalSchema(exposedSchema) {
   internalSchema.name = exposedSchema.name;
   internalSchema.email = exposedSchema.email;
   internalSchema.numberOfTickets = exposedSchema.numberOfTickets;
+  internalSchema.amount = exposedSchema.amount;
 
   return internalSchema;
 }
