@@ -52,7 +52,7 @@ app.get(
   }
 );
 
-app.get(
+app.put(
   "/api/putPaymentResult",
   validatePutPaymentResult(exposedSchemaPutPaymentResult),
   async (req, res) => {
