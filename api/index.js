@@ -6,7 +6,12 @@ import {
   exposedSchema as exposedSchemaPaymentReference,
   mapToInternalSchema as mapToInternalSchemaPaymentReference,
 } from "./Shemas/schemaPaymentReference.js";
-import { savePaymentReference } from "./utils/databaseStorage.js";
+import {
+  validate as validatePaymentResult,
+  exposedSchema as exposedSchemaPaymentResult,
+  mapToInternalSchema as mapToInternalSchemaPaymentResult,
+} from "./Shemas/schemaPaymentResult.js";
+import { savePaymentReference, getPaymentResult } from "./utils/databaseStorage.js";
 
 dotenv.config();
 
@@ -17,13 +22,27 @@ app.use(express.json()); //use is for midleware
 app.use(cors());
 
 app.post(
-  "/api/paymentReference",
+  "/api/postPaymentReference",
   validatePaymentReference(exposedSchemaPaymentReference),
   async (req, res) => {
     const incomingExposedSchema = req.body;
     const internalSchema = mapToInternalSchemaPaymentReference(incomingExposedSchema);
-    const reference = await savePaymentReference(internalSchema, data);
+    const reference = {
+      reference: await savePaymentReference(internalSchema)
+    } 
+    res.send(reference);
+  }
+);
 
+app.get(
+  "/api/getPaymentResult",
+  validatePaymentResult(exposedSchemaPaymentResult),
+  async (req, res) => {
+    const incomingExposedSchema = req.query;
+    const internalSchema = mapToInternalSchemaPaymentResult(incomingExposedSchema);
+    const reference = {
+      paid: await getPaymentResult(internalSchema)
+    } 
     res.send(reference);
   }
 );
