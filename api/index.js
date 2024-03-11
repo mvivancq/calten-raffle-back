@@ -32,8 +32,11 @@ app.post(
   async (req, res) => {
     const incomingExposedSchema = req.body;
     const internalSchema = mapToInternalSchemaPaymentReference(incomingExposedSchema);
+    const rows = await savePaymentReference(internalSchema);
+    const row = rows[0];
+    console.log(row)
     const reference = {
-      reference: await savePaymentReference(internalSchema)
+      reference: row.id
     } 
     res.send(reference);
   }
@@ -45,8 +48,10 @@ app.get(
   async (req, res) => {
     const incomingExposedSchema = req.query;
     const internalSchema = mapToInternalSchemaPaymentResult(incomingExposedSchema);
+    const rows = await getPaymentResult(internalSchema);
+    const row = rows[0];
     const reference = {
-      paid: await getPaymentResult(internalSchema)
+      paid: row.status
     } 
     res.send(reference);
   }

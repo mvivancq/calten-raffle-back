@@ -3,7 +3,8 @@ import yup from "yup";
 const internalSchemaSkeleton = {
   name: "",
   email: "",
-  numberOfTickets: "",
+  numberOfTickets: 0,
+  amount: 0,
 };
 
 export const validate = (schema) => async (req, res, next) => {
