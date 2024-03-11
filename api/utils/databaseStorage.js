@@ -42,8 +42,8 @@ export const putPaymentResult = async (schema) => {
     return await db('raffle')
     .returning("*")
     .where('id', schema.reference)
-    .andWhere('commerceCertification', schema.commerceCertification)
-    .andWhere('amount', schema.amount)
+    //.andWhere('commerceCertification', schema.commerceCertification)
+    //.andWhere('amount', schema.amount)
     .update({ status: schema.status })
     .then( val =>  {
             console.log('success updating the data');
