@@ -55,5 +55,4 @@ export const putPaymentResult = async (schema) => {
         console.log(err);
         return err;
     });
-    return 1;
 }
