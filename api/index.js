@@ -11,7 +11,12 @@ import {
   exposedSchema as exposedSchemaPaymentResult,
   mapToInternalSchema as mapToInternalSchemaPaymentResult,
 } from "./Shemas/schemaPaymentResult.js";
-import { savePaymentReference, getPaymentResult } from "./utils/databaseStorage.js";
+import {
+  validate as validatePutPaymentResult,
+  exposedSchema as exposedSchemaPutPaymentResult,
+  mapToInternalSchema as mapToInternalSchemaPutPaymentResult,
+} from "./Shemas/schemaPutPaymentResult.js";
+import { savePaymentReference, getPaymentResult, putPaymentResult } from "./utils/databaseStorage.js";
 
 dotenv.config();
 
@@ -44,6 +49,19 @@ app.get(
       paid: await getPaymentResult(internalSchema)
     } 
     res.send(reference);
+  }
+);
+
+app.get(
+  "/api/putPaymentResult",
+  validatePutPaymentResult(exposedSchemaPutPaymentResult),
+  async (req, res) => {
+    console.log(req.body);
+    const incomingExposedSchema = req.body;
+    const internalSchema = mapToInternalSchemaPutPaymentResult(incomingExposedSchema);
+    await putPaymentResult(internalSchema);
+    const response = { status: 'success' }
+    res.send(response);
   }
 );
 
