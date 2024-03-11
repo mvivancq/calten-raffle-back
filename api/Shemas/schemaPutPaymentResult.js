@@ -1,8 +1,10 @@
 import yup from "yup";
 
 const internalSchemaSkeleton = {
-  status: 0,
+  reference: 0,
   amount: 0,
+  commerceCertification: "",
+  status: 0,
 };
 
 export const validate = (schema) => async (req, res, next) => {
@@ -18,12 +20,14 @@ export function mapToInternalSchema(exposedSchema) {
   const internalSchema = { ...internalSchemaSkeleton };
   internalSchema.status = exposedSchema.status;
   internalSchema.amount = exposedSchema.amount;
+  internalSchema.reference = exposedSchema.reference;
+  internalSchema.commerceCertification = exposedSchema.commerceCertification;
 
   return internalSchema;
 }
 
 export const exposedSchema = yup.object().shape({
-  result: yup
+  status: yup
     .number()
     .required("Payment status required field"),
 

@@ -60,6 +60,7 @@ app.get(
     const incomingExposedSchema = req.body;
     const internalSchema = mapToInternalSchemaPutPaymentResult(incomingExposedSchema);
     await putPaymentResult(internalSchema);
+    console.log(internalSchema);
     const response = { status: 'success' }
     res.send(response);
   }
