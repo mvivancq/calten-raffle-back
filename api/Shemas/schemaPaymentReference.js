@@ -4,7 +4,6 @@ const internalSchemaSkeleton = {
   name: "",
   email: "",
   numberOfTickets: 0,
-  amount: 0,
 };
 
 export const validate = (schema) => async (req, res, next) => {
@@ -21,22 +20,23 @@ export function mapToInternalSchema(exposedSchema) {
   internalSchema.name = exposedSchema.name;
   internalSchema.email = exposedSchema.email;
   internalSchema.numberOfTickets = exposedSchema.numberOfTickets;
-  internalSchema.amount = exposedSchema.amount;
 
   return internalSchema;
 }
 
 export const exposedSchema = yup.object().shape({
   name: yup
-    .string()
-    .max(80, "Name must be at most 40 characters long"),
+  .string()
+  .max(80, "Name must be at most 80 characters long")
+  .required("Name is a required field"),
 
   email: yup
-    .string()
-    .max(80, "Name must be at most 40 characters long"),
+  .string()
+  .max(40, "email must be at most 40 characters long")
+  .required("email is a required field"),
 
   numberOfTickets: yup
-    .number()
-    .required("Number of tickets is a required field"),
+  .number()
+  .required("Number of tickets is a required field"),
 
 });

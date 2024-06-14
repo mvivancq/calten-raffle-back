@@ -2,14 +2,9 @@ import db from './databaseConfig.js';
 import * as dotenv from 'dotenv' 
 dotenv.config()
 
-export const savePaymentReference = async (schema) => {
+export const savePaymentReference = async (data) => {
     console.log('insert payment reference into db');
-    return await db.insert({ 
-        numberOfTickets: schema.numberOfTickets,
-        amount: schema.amount,
-        name: schema.name,
-        email: schema.email,
-    })
+    return await db.insert(data)
     .into('raffle')
     .returning("*")
     .then( val =>  {

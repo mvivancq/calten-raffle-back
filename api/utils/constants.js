@@ -1,4 +1,4 @@
 export const constants = {
-    paymentRequest: "https://sintb3.codi.org.mx/bcodi-nopresencial/solicitudCobro",
-    paymentRequestStatus: "https://sintb3.codi.org.mx/bcodi-nopresencial/consultaEstadoOperacion",
+    ticketPrice: 50,
+    caltenApisCreateRequest: "https://calten-backend-pi.vercel.app/api/createPrivateRequest"
 };

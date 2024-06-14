@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import { constants } from "./utils/constants.js";
 import {
   validate as validatePaymentReference,
   exposedSchema as exposedSchemaPaymentReference,
@@ -16,6 +17,7 @@ import {
   exposedSchema as exposedSchemaPutPaymentResult,
   mapToInternalSchema as mapToInternalSchemaPutPaymentResult,
 } from "./Shemas/schemaPutPaymentResult.js";
+import axios from "axios";
 import { savePaymentReference, getPaymentResult, putPaymentResult } from "./utils/databaseStorage.js";
 
 dotenv.config();
@@ -32,18 +34,47 @@ app.post(
   async (req, res) => {
     const incomingExposedSchema = req.body;
     const internalSchema = mapToInternalSchemaPaymentReference(incomingExposedSchema);
-    const rows = await savePaymentReference(internalSchema);
+    const payload = {
+      reference: 21,
+      concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
+      amount: internalSchema.numberOfTickets * constants.ticketPrice,
+      callback: "https://www.banxico.org.mx/RegistroCoDi-Beta/",
+      urlSuccess: "https://www.google.com/search?q=success",
+      urlFailure: "https://www.google.com/search?q=failure"
+    }
+    const {data} = await axios.post(constants.caltenApisCreateRequest, payload, {
+      headers: { 'Content-type': 'application/json; charset=UTF-8',}
+    }).then( val =>  {
+      console.log(`success creating the payment`);
+      return val;
+    })
+    .catch(err => {
+      console.log(`error creating the payment`);
+      console.log(err);
+      return res.status(500).json({});
+    }); 
+    if(!data)
+      return;
+    if(data.requestStatus !== 0)
+      return res.status(500).json({});
+    console.log(data);
+    const payloaData = {
+      paymentId: data.resultDetails.id,
+      name: internalSchema.name,
+      email: internalSchema.email,
+      amount: payload.amount,
+      tickets: internalSchema.numberOfTickets,
+    }
+    const rows = await savePaymentReference(payloaData);
     const row = rows[0];
     console.log(row)
-    const reference = {
-      reference: row.id
-    } 
-    res.send(reference);
+
+    res.send({ paymentId: data.resultDetails.id});
   }
 );
 
 app.get(
-  "/api/getPaymentResult",
+  "/api/getPayment",
   validatePaymentResult(exposedSchemaPaymentResult),
   async (req, res) => {
     const incomingExposedSchema = req.query;
