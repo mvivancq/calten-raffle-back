@@ -38,9 +38,9 @@ app.post(
       reference: 21,
       concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
       amount: internalSchema.numberOfTickets * constants.ticketPrice,
-      callback: "https://www.banxico.org.mx/RegistroCoDi-Beta/",
-      urlSuccess: "https://www.google.com/search?q=success",
-      urlFailure: "https://www.google.com/search?q=failure"
+      callback: "https://calten-raffle-back.vercel.app/api/putPaymentResult",
+      urlSuccess: "https://calten-raffle.vercel.app/success",
+      urlFailure: "https://calten-raffle.vercel.app/failure"
     }
     const {data} = await axios.post(constants.caltenApisCreateRequest, payload, {
       headers: { 'Content-type': 'application/json; charset=UTF-8',}
