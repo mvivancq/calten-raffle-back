@@ -73,20 +73,6 @@ app.post(
   }
 );
 
-app.get(
-  "/api/getPayment",
-  validatePaymentResult(exposedSchemaPaymentResult),
-  async (req, res) => {
-    const incomingExposedSchema = req.query;
-    const internalSchema = mapToInternalSchemaPaymentResult(incomingExposedSchema);
-    const rows = await getPaymentResult(internalSchema);
-    const row = rows[0];
-    const reference = {
-      paid: row.status
-    } 
-    res.send(reference);
-  }
-);
 
 app.put(
   "/api/putPaymentResult",
