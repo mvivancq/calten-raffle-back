@@ -35,8 +35,8 @@ app.post(
       concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
       amount: internalSchema.numberOfTickets * constants.ticketPrice,
       callback: "https://calten-raffle-back.vercel.app/api/putPaymentResult",
-      urlSuccess: `https://calten-raffle.vercel.app/success/name=${stringName}&email=${internalSchema.email}`,
-      urlFailure: `https://calten-raffle.vercel.app/name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
+      urlSuccess: `https://calten-raffle.vercel.app/success?name=${stringName}&email=${internalSchema.email}`,
+      urlFailure: `https://calten-raffle.vercel.app?name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
     }
     const {data} = await axios.post(constants.caltenApisCreateRequest, payload, {
       headers: { 'Content-type': 'application/json; charset=UTF-8',}
