@@ -73,7 +73,6 @@ app.post(
   }
 );
 
-
 app.put(
   "/api/putPaymentResult",
   validatePutPaymentResult(exposedSchemaPutPaymentResult),
