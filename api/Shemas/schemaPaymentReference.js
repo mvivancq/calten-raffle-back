@@ -32,7 +32,7 @@ export const exposedSchema = yup.object().shape({
 
   email: yup
   .string()
-  .max(40, "email must be at most 40 characters long")
+  .email("email must be at email format")
   .required("email is a required field"),
 
   numberOfTickets: yup
