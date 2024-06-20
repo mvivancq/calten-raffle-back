@@ -36,18 +36,16 @@ export const getPaymentResult = async (schema) => {
 export const putPaymentResult = async (schema) => {
     return await db('raffle')
     .returning("*")
-    .where('id', schema.reference)
-    //.andWhere('commerceCertification', schema.commerceCertification)
-    //.andWhere('amount', schema.amount)
+    .where('paymentId', schema.id)
+    .andWhere('amount', schema.amount)
     .update({ status: schema.status })
     .then( val =>  {
-            console.log('success updating the data');
-            return val;
-        }
-    )
+        console.log('success updating the data');
+        return val;
+    })
     .catch(err => {
         console.log('error updating the data');
         console.log(err);
-        return err;
+        return [];
     });
 }

@@ -3,7 +3,7 @@ import yup from "yup";
 const internalSchemaSkeleton = {
   reference: 0,
   amount: 0,
-  commerceCertification: "",
+  id: 0,
   status: 0,
 };
 
@@ -21,7 +21,7 @@ export function mapToInternalSchema(exposedSchema) {
   internalSchema.status = exposedSchema.status;
   internalSchema.amount = exposedSchema.amount;
   internalSchema.reference = exposedSchema.reference;
-  internalSchema.commerceCertification = exposedSchema.commerceCertification;
+  internalSchema.id = exposedSchema.id;
 
   return internalSchema;
 }
@@ -34,5 +34,13 @@ export const exposedSchema = yup.object().shape({
   amount: yup
     .number()
     .required("Amount paid is a required field"),
+  
+  reference: yup
+    .number()
+    .required("Reference is a required field"),
+    
+  id: yup
+    .number()
+    .required("ID is a required field"),
 
 });

@@ -8,11 +8,6 @@ import {
   mapToInternalSchema as mapToInternalSchemaPaymentReference,
 } from "./Shemas/schemaPaymentReference.js";
 import {
-  validate as validatePaymentResult,
-  exposedSchema as exposedSchemaPaymentResult,
-  mapToInternalSchema as mapToInternalSchemaPaymentResult,
-} from "./Shemas/schemaPaymentResult.js";
-import {
   validate as validatePutPaymentResult,
   exposedSchema as exposedSchemaPutPaymentResult,
   mapToInternalSchema as mapToInternalSchemaPutPaymentResult,
@@ -64,6 +59,7 @@ app.post(
       email: internalSchema.email,
       amount: payload.amount,
       tickets: internalSchema.numberOfTickets,
+      status: -1,
     }
     const rows = await savePaymentReference(payloaData);
     const row = rows[0];
@@ -80,9 +76,12 @@ app.put(
     console.log(req.body);
     const incomingExposedSchema = req.body;
     const internalSchema = mapToInternalSchemaPutPaymentResult(incomingExposedSchema);
-    await putPaymentResult(internalSchema);
     console.log(internalSchema);
-    const response = { status: 'success' }
+    const result = await putPaymentResult(internalSchema);
+    if(!result || result.length < 1)
+      return res.status(400).send('request not found');
+    console.log(result);
+    const response = { status: 0 }
     res.send(response);
   }
 );
