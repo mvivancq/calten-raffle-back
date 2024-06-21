@@ -14,6 +14,7 @@ import {
 } from "./Shemas/schemaPutPaymentResult.js";
 import axios from "axios";
 import { savePaymentReference, getPaymentResult, putPaymentResult } from "./utils/databaseStorage.js";
+import { sendCaltenEmail } from "./utils/emailSender.js";
 
 dotenv.config();
 
@@ -38,7 +39,8 @@ app.post(
       urlSuccess: `https://calten-raffle.vercel.app/success?name=${stringName}&email=${internalSchema.email}`,
       urlFailure: `https://calten-raffle.vercel.app?name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
     }
-    const {data} = await axios.post(constants.caltenApisCreateRequest, payload, {
+    const api = process.env.CALTENAPI + constants.caltenApis.createRequest;
+    const {data} = await axios.post(api, payload, {
       headers: { 'Content-type': 'application/json; charset=UTF-8',}
     }).then( val =>  {
       console.log(`success creating the payment`);
@@ -83,6 +85,8 @@ app.put(
       return res.status(400).send('request not found');
     console.log(result);
     const response = { status: 0 }
+    if(result[0].status === 1)
+      sendCaltenEmail(result[0]);
     res.send(response);
   }
 );
