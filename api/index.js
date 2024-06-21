@@ -13,7 +13,7 @@ import {
   mapToInternalSchema as mapToInternalSchemaPutPaymentResult,
 } from "./Shemas/schemaPutPaymentResult.js";
 import axios from "axios";
-import { savePaymentReference, getPaymentResult, putPaymentResult } from "./utils/databaseStorage.js";
+import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
 import { sendCaltenEmail } from "./utils/emailSender.js";
 
 dotenv.config();
