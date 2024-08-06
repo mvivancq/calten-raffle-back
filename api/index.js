@@ -44,7 +44,7 @@ app.post(
     const {data} = await axios.post(api, payload, {
       headers: { 'Content-type': 'application/json; charset=UTF-8',}
     }).then( val =>  {
-      console.log(`success creating the payment`);
+      console.log(`success creating the payment`); 
       return val;
     })
     .catch(err => {
