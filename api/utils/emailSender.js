@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import fs from "fs";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -11,14 +12,20 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendCaltenEmail = async (purchaseData) => {
+    const htmlTemplate = fs.readFileSync('./api/utils/emailTemplate.html', 'utf-8');
+
+    const htmlContent = htmlTemplate
+        .replace('{{name}}', purchaseData.name)
+        .replace('{{many}}', purchaseData.tickets > 1 ? 's' : '')
+        .replace('{{many}}', purchaseData.tickets > 1 ? 's' : '')
+        .replace('{{num}}', 'numero234')
+        .replace('{{tickets}}', purchaseData.tickets);
+
     var mailOptions = {
         from: process.env.CALTENMAIL,
         to: purchaseData.email,
         subject: 'Compra boletos Rifa Calten',
-        //text: `Gracias ${purchaseData.name} por la compra de ${purchaseData.tickets} boletos para la rifa`,
-        html: `<h1>Gracias ${purchaseData.name}</h1>
-        <p>Compra de ${purchaseData.tickets} boletos para la rifa</p>
-        <img src=\"https://calten-raffle.vercel.app/assets/calten-D3byka7V.png\" width="400" alt="calten logo">`
+        html: htmlContent
     };
       
     transporter.sendMail(mailOptions, function(error, info){
