@@ -108,6 +108,19 @@ app.put(
   }
 );
 
+// app.post(
+//   "/api/testEmail",
+//   async (req, res) => {
+//     console.log('sending email');
+//     const purchaseData = {
+//       name: 'Martin',
+//       email: 'mavp98@hotmail.com'
+//     }
+//     sendCaltenEmail(purchaseData);
+//     res.send('sent');
+//   }
+// );
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
