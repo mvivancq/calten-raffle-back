@@ -121,7 +121,7 @@ app.post(
   validatePostPaymentResult(exposedSchemaPostPaymentResult),
   async (req, res) => {
     const incomingExposedSchema = req.body;
-    if( !verifySign(incomingExposedSchema.signature, JSON.stringify(incomingExposedSchema.data), process.env.PUBLIC_KEY_CALTEN64)) {
+    if( !verifySign(incomingExposedSchema.signature, JSON.stringify(incomingExposedSchema.data), process.env.KEY_CALTEN64)) {
       return res.status(404).json({ status: 1 });
     }
     const internalSchema = mapToInternalSchemaPostPaymentResult(incomingExposedSchema);
