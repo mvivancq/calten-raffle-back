@@ -8,10 +8,10 @@ import {
   mapToInternalSchema as mapToInternalSchemaPaymentReference,
 } from "./Shemas/schemaPaymentReference.js";
 import {
-  validate as validatePutPaymentResult,
-  exposedSchema as exposedSchemaPutPaymentResult,
-  mapToInternalSchema as mapToInternalSchemaPutPaymentResult,
-} from "./Shemas/schemaPutPaymentResult.js";
+  validate as validatePostPaymentResult,
+  exposedSchema as exposedSchemaPostPaymentResult,
+  mapToInternalSchema as mapToInternalSchemaPostPaymentResult,
+} from "./Shemas/schemaPostPaymentResult.js";
 import axios from "axios";
 import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
 import { sendCaltenEmail } from "./utils/emailSender.js";
@@ -77,7 +77,7 @@ app.post(
         reference: 21,
         concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
         amount: internalSchema.numberOfTickets * constants.ticketPrice,
-        callback: `${process.env.RAFFLEBACKEND}/api/putPaymentResult`,
+        callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
         urlSuccess: `${process.env.RAFFLEFRONTEND}/success?name=${stringName}&email=${internalSchema.email}`,
         urlFailure: `${process.env.RAFFLEFRONTEND}?name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
       };
@@ -115,13 +115,12 @@ app.post(
   }
 );
 
-app.put(
-  "/api/putPaymentResult",
-  validatePutPaymentResult(exposedSchemaPutPaymentResult),
+app.post(
+  "/api/postPaymentResult",
+  validatePostPaymentResult(exposedSchemaPostPaymentResult),
   async (req, res) => {
-    console.log(req.body);
     const incomingExposedSchema = req.body;
-    const internalSchema = mapToInternalSchemaPutPaymentResult(incomingExposedSchema);
+    const internalSchema = mapToInternalSchemaPostPaymentResult(incomingExposedSchema);
     console.log(internalSchema);
     const result = await putPaymentResult(internalSchema);
     if(!result || result.length < 1)
