@@ -15,6 +15,7 @@ import {
 import axios from "axios";
 import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
 import { sendCaltenEmail } from "./utils/emailSender.js";
+import { verifySign } from "./utils/sign-key.js";
 
 
 dotenv.config();
@@ -120,12 +121,13 @@ app.post(
   validatePostPaymentResult(exposedSchemaPostPaymentResult),
   async (req, res) => {
     const incomingExposedSchema = req.body;
+    if( !verifySign(incomingExposedSchema.signature, JSON.stringify(incomingExposedSchema.data), process.env.PUBLIC_KEY_CALTEN64)) {
+      return res.status(404).json({ status: 1 });
+    }
     const internalSchema = mapToInternalSchemaPostPaymentResult(incomingExposedSchema);
-    console.log(internalSchema);
     const result = await putPaymentResult(internalSchema);
     if(!result || result.length < 1)
       return res.status(400).send('request not found');
-    console.log(result);
     const response = { status: 0 }
     if(result[0].status === 1)
       sendCaltenEmail(result[0]);
