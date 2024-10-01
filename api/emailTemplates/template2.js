@@ -1,6 +1,6 @@
+export const template2 = `
 <html style="margin: 0; padding: 0">
 
-</html>
 
 <head>
     <meta charset="utf-8">
@@ -325,3 +325,4 @@
 </body>
 
 </html>
+`;

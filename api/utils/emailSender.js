@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
-import fs from "fs";
+//import { template1 } from '../emailTemplates/template1.js';
+import { template2 } from '../emailTemplates/template2.js';
 import { constants } from "./constants.js";
 import { logger } from "./logger.js";
 
@@ -26,13 +27,11 @@ export const sendCaltenEmail = async (purchaseData) => {
       //     .replace('{{tickets}}', purchaseData.tickets);
 
       // Template 2
-      const htmlTemplate = fs.readFileSync('./api/emailTemplates/template2.html', 'utf-8');
-      
       // Random email data from constants
       const emailData = constants.emails[Math.floor(Math.random() * 3)];
   
       // Replace placeholders with actual data in the template
-      const htmlContent = htmlTemplate
+      const htmlContent = template2
         .replaceAll('{{name}}', purchaseData.name)
         .replaceAll('{{member}}', emailData.member)
         .replace('{{team}}', emailData.team)
