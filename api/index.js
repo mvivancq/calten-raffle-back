@@ -16,6 +16,7 @@ import axios from "axios";
 import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
 import { sendCaltenEmail } from "./utils/emailSender.js";
 import { verifySign } from "./utils/sign-key.js";
+import { logger } from "./utils/logger.js";
 
 
 dotenv.config();

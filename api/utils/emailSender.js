@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import fs from "fs";
 import { constants } from "./constants.js";
+import { logger } from "./logger.js";
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
