@@ -1,3 +1,4 @@
+export const template1 = `
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="es" style="padding:0;Margin:0">
  <head>
   <meta charset="UTF-8">
@@ -246,3 +247,5 @@ a[x-apple-data-detectors] {
   </div>
  </body>
 </html>
+`;
+

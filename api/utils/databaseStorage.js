@@ -1,50 +1,47 @@
 import db from './databaseConfig.js';
-import * as dotenv from 'dotenv' 
-dotenv.config()
+import * as dotenv from 'dotenv';
+import { logger } from './logger.js'; // Assuming you have a logger setup
+dotenv.config();
 
+// Save Payment Reference
 export const savePaymentReference = async (data) => {
-    console.log('insert payment reference into db');
-    return await db.insert(data)
-    .into('raffle')
-    .returning("*")
-    .then( val =>  {
-            console.log('success inserting the data');
-            return val;
-        }
-    )
-    .catch(err => {
-        console.log('error inserting the data');
-        console.log(err);
-    });
-}
+    try {
+        logger.info('Inserting payment reference into the database');
+        const result = await db('raffle').insert(data).returning("*");
+        logger.info('Successfully inserted payment reference');
+        return result;
+    } catch (err) {
+        logger.error('Error inserting payment reference', err);
+        throw new Error('Database error while inserting payment reference');
+    }
+};
 
+// Get Payment Result
 export const getPaymentResult = async (schema) => {
-    return await db('raffle')
-    .returning("*")
-    .where('id', schema.reference)
-    .then( val =>  {
-            console.log('success ');
-            return val;
-        }
-    )
-    .catch(err => {
-        console.log('error ');
-        console.log(err);
-    });
-}
+    try {
+        logger.info(`Retrieving payment result for reference ${schema.reference}`);
+        const result = await db('raffle').where('id', schema.reference).returning("*");
+        logger.info('Successfully retrieved payment result');
+        return result;
+    } catch (err) {
+        logger.error('Error retrieving payment result', err);
+        throw new Error('Database error while retrieving payment result');
+    }
+};
 
+// Update Payment Result
 export const putPaymentResult = async (schema) => {
-    return await db('raffle')
-    .returning("*")
-    .where('paymentId', schema.id)
-    .update({ status: schema.status })
-    .then( val =>  {
-        console.log('success updating the data');
-        return val;
-    })
-    .catch(err => {
-        console.log('error updating the data');
-        console.log(err);
-        return [];
-    });
-}
+    try {
+        logger.info(`Updating payment result for paymentId ${schema.id}`);
+        const result = await db('raffle')
+            .where('paymentId', schema.id)
+            .update({ status: schema.status })
+            .returning("*");
+        logger.info('Successfully updated payment result');
+        return result;
+    } catch (err) {
+        logger.error('Error updating payment result', err);
+        throw new Error('Database error while updating payment result');
+    }
+};
+
