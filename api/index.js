@@ -67,13 +67,15 @@ app.post(
   "/api/postPaymentReference",
   validatePaymentReference(exposedSchemaPaymentReference),
   async (req, res) => {
-    const incomingExposedSchema = req.body;
-    const internalSchema = mapToInternalSchemaPaymentReference(incomingExposedSchema);
-    const stringName = internalSchema.name.replace(/ /g, '%20');
-
     try {
-      const token = await getToken(); // Get the token (cached or new)
+      const incomingExposedSchema = req.body;
+      const internalSchema = mapToInternalSchemaPaymentReference(incomingExposedSchema);
+      const stringName = encodeURIComponent(internalSchema.name); // More robust encoding
+      
+      // Fetch or cache token
+      const token = await getToken();
 
+      // Prepare payload for the API request
       const payload = {
         reference: 21,
         concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
@@ -83,6 +85,7 @@ app.post(
         urlFailure: `${process.env.RAFFLEFRONTEND}?name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
       };
 
+      // Make the request to the external API
       const api = process.env.CALTENAPI + constants.caltenApis.createRequest;
       const { data } = await axios.post(api, payload, {
         headers: {
@@ -91,49 +94,82 @@ app.post(
         }
       });
 
+      // Check if the request was successful
       if (!data || data.requestStatus !== 0) {
-        return res.status(500).json({});
+        logger.error('Failed to create payment request');
+        return res.status(500).json({ error: 'Payment request failed' });
       }
 
+      // Save payment reference in the database
       const payloaData = {
         paymentId: data.resultDetails.id,
         name: internalSchema.name,
         email: internalSchema.email,
         amount: payload.amount,
         tickets: internalSchema.numberOfTickets,
-        status: -1,
+        status: -1
       };
 
       const rows = await savePaymentReference(payloaData);
       const row = rows[0];
-      console.log(row);
+      logger.info(`Payment reference saved: ${row.paymentId}`);
 
+      // Respond with the payment ID
       res.send({ paymentId: data.resultDetails.id });
     } catch (err) {
-      console.log("Error creating the payment", err);
-      res.status(500).json({});
+      logger.error('Error creating the payment', err);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 );
+
 
 app.post(
   "/api/postPaymentResult",
   validatePostPaymentResult(exposedSchemaPostPaymentResult),
   async (req, res) => {
-    const incomingExposedSchema = req.body;
-    if( !verifySign(incomingExposedSchema.signature, JSON.stringify(incomingExposedSchema.data), process.env.KEY_CALTEN64)) {
-      return res.status(404).json({ status: 1 });
+    try {
+      const incomingExposedSchema = req.body;
+
+      // Verify the signature
+      const isValidSignature = verifySign(
+        incomingExposedSchema.signature, 
+        JSON.stringify(incomingExposedSchema.data), 
+        process.env.KEY_CALTEN64
+      );
+
+      if (!isValidSignature) {
+        logger.warn('Invalid signature for payment result');
+        return res.status(404).json({ status: 1 });
+      }
+
+      // Map the external schema to internal schema
+      const internalSchema = mapToInternalSchemaPostPaymentResult(incomingExposedSchema);
+
+      // Update payment result in the database
+      const result = await putPaymentResult(internalSchema);
+      
+      if (!result || result.length < 1) {
+        logger.warn(`Payment result not found for id: ${internalSchema.id}`);
+        return res.status(400).send('Request not found');
+      }
+
+      // Send a response
+      const response = { status: 0 };
+
+      // If the payment is successful (status 1), send a confirmation email
+      if (result[0].status === 1) {
+        await sendCaltenEmail(result[0]);
+      }
+
+      res.send(response);
+    } catch (err) {
+      logger.error('Error processing payment result', err);
+      res.status(500).json({ error: 'Internal server error' });
     }
-    const internalSchema = mapToInternalSchemaPostPaymentResult(incomingExposedSchema);
-    const result = await putPaymentResult(internalSchema);
-    if(!result || result.length < 1)
-      return res.status(400).send('request not found');
-    const response = { status: 0 }
-    if(result[0].status === 1)
-      sendCaltenEmail(result[0]);
-    res.send(response);
   }
 );
+
 
 // app.post(
 //   "/api/testEmail",
