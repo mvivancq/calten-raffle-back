@@ -88,7 +88,7 @@ app.post(
 
       // Make the request to the external API
       const api = process.env.CALTENAPI + constants.caltenApis.createRequest;
-      const { data } = await axios.post(api, payload, {
+      const { data: result } = await axios.post(api, payload, {
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
           'authorization': `Bearer ${token}`
@@ -96,14 +96,14 @@ app.post(
       });
 
       // Check if the request was successful
-      if (!data || data.requestStatus !== 0) {
+      if (!result.data || result.requestStatus !== 0) {
         logger.error('Failed to create payment request');
         return res.status(500).json({ error: 'Payment request failed' });
       }
 
       // Save payment reference in the database
       const payloaData = {
-        paymentId: data.resultDetails.id,
+        paymentId: result.data.id,
         name: internalSchema.name,
         email: internalSchema.email,
         amount: payload.amount,
@@ -116,7 +116,7 @@ app.post(
       logger.info(`Payment reference saved: ${row.paymentId}`);
 
       // Respond with the payment ID
-      res.send({ paymentId: data.resultDetails.id });
+      res.send({ paymentId: result.data.id });
     } catch (err) {
       logger.error('Error creating the payment', err);
       res.status(500).json({ error: 'Internal server error' });
