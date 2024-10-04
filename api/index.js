@@ -96,9 +96,13 @@ app.post(
       });
 
       // Check if the request was successful
-      if (!result.data || result.requestStatus !== 0) {
+      if (!result.data || result.requestStatus !== 200) {   
         logger.error('Failed to create payment request');
-        return res.status(500).json({ error: 'Payment request failed' });
+        const result = {
+          requestStatus: 500,
+          statusMessage: 'Payment request failed'
+        };
+        res.status(500).json(result);
       }
 
       // Save payment reference in the database
@@ -119,11 +123,14 @@ app.post(
       res.send({ paymentId: result.data.id });
     } catch (err) {
       logger.error('Error creating the payment', err);
-      res.status(500).json({ error: 'Internal server error' });
+      const result = {
+        requestStatus: 500,
+        statusMessage: 'Internal server error'
+      };
+      res.status(500).json(result);
     }
   }
 );
-
 
 app.post(
   "/api/postPaymentResult",
@@ -141,7 +148,11 @@ app.post(
 
       if (!isValidSignature) {
         logger.warn('Invalid signature for payment result');
-        return res.status(404).json({ status: 1 });
+        const result = {
+          requestStatus: 404,
+          statusMessage: 'Invalid signature for payment result'
+        };
+        return res.status(404).json(result);
       }
 
       // Map the external schema to internal schema
@@ -152,11 +163,15 @@ app.post(
       
       if (!result || result.length < 1) {
         logger.warn(`Payment result not found for id: ${internalSchema.id}`);
-        return res.status(400).send('Request not found');
+        const result = {
+          requestStatus: 400,
+          statusMessage: 'Request not found'
+        };
+        return res.status(404).json(result);
       }
 
       // Send a response
-      const response = { status: 0 };
+      const response = { status: 200 };
 
       // If the payment is successful (status 1), send a confirmation email
       if (result[0].status === 1) {
@@ -166,7 +181,11 @@ app.post(
       res.send(response);
     } catch (err) {
       logger.error('Error processing payment result', err);
-      res.status(500).json({ error: 'Internal server error' });
+      const result = {
+        requestStatus: 500,
+        statusMessage: 'Internal server error'
+      };
+      res.status(500).json(result);
     }
   }
 );
