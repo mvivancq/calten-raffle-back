@@ -88,22 +88,16 @@ app.post(
 
       // Make the request to the external API
       const api = process.env.CALTENAPI + constants.caltenApis.createRequest;
-      const { data } = await axios.post(api, payload, {
+      const { data: result } = await axios.post(api, payload, {
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
           'authorization': `Bearer ${token}`
         }
       });
 
-      // Check if the request was successful
-      if (!data || data.requestStatus !== 0) {
-        logger.error('Failed to create payment request');
-        return res.status(500).json({ error: 'Payment request failed' });
-      }
-
       // Save payment reference in the database
       const payloaData = {
-        paymentId: data.resultDetails.id,
+        paymentId: result.data.id,
         name: internalSchema.name,
         email: internalSchema.email,
         amount: payload.amount,
@@ -116,14 +110,17 @@ app.post(
       logger.info(`Payment reference saved: ${row.paymentId}`);
 
       // Respond with the payment ID
-      res.send({ paymentId: data.resultDetails.id });
+      res.send({ paymentId: result.data.id });
     } catch (err) {
       logger.error('Error creating the payment', err);
-      res.status(500).json({ error: 'Internal server error' });
+      const result = {
+        requestStatus: 500,
+        statusMessage: 'Internal server error'
+      };
+      res.status(500).json(result);
     }
   }
 );
-
 
 app.post(
   "/api/postPaymentResult",
@@ -141,7 +138,11 @@ app.post(
 
       if (!isValidSignature) {
         logger.warn('Invalid signature for payment result');
-        return res.status(404).json({ status: 1 });
+        const result = {
+          requestStatus: 404,
+          statusMessage: 'Invalid signature for payment result'
+        };
+        return res.status(404).json(result);
       }
 
       // Map the external schema to internal schema
@@ -152,11 +153,15 @@ app.post(
       
       if (!result || result.length < 1) {
         logger.warn(`Payment result not found for id: ${internalSchema.id}`);
-        return res.status(400).send('Request not found');
+        const result = {
+          requestStatus: 400,
+          statusMessage: 'Request not found'
+        };
+        return res.status(404).json(result);
       }
 
       // Send a response
-      const response = { status: 0 };
+      const response = { status: 200 };
 
       // If the payment is successful (status 1), send a confirmation email
       if (result[0].status === 1) {
@@ -166,7 +171,11 @@ app.post(
       res.send(response);
     } catch (err) {
       logger.error('Error processing payment result', err);
-      res.status(500).json({ error: 'Internal server error' });
+      const result = {
+        requestStatus: 500,
+        statusMessage: 'Internal server error'
+      };
+      res.status(500).json(result);
     }
   }
 );
