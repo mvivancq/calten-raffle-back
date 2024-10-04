@@ -95,16 +95,6 @@ app.post(
         }
       });
 
-      // Check if the request was successful
-      if (!result.data || result.requestStatus !== 200) {   
-        logger.error('Failed to create payment request');
-        const result = {
-          requestStatus: 500,
-          statusMessage: 'Payment request failed'
-        };
-        res.status(500).json(result);
-      }
-
       // Save payment reference in the database
       const payloaData = {
         paymentId: result.data.id,
