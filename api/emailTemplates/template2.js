@@ -216,7 +216,7 @@ export const template2 = `
                                                 <p style="margin-top: 0; margin-bottom: 0;">Premio: Apple Airpods</p>
                                             </li>
                                             <li style="margin-bottom: 2px;">
-                                                <p style="margin-top: 0; margin-bottom: 0;">Fecha de sorteo: 15 de
+                                                <p style="margin-top: 0; margin-bottom: 0;">Fecha de sorteo: 31 de
                                                     Octubre</p>
                                             </li>
                                             <li style="margin-bottom: 2px;">
