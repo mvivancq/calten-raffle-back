@@ -17,7 +17,7 @@ import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.
 import { sendCaltenEmail } from "./utils/emailSender.js";
 import { verifySign } from "./utils/sign-key.js";
 import { logger } from "./utils/logger.js";
-import { checkEmailDomain } from "./utils/functions.js";
+import { checkDomainConcept, checkEmailDomain } from "./utils/functions.js";
 
 
 dotenv.config();
@@ -77,11 +77,12 @@ app.post(
       // Fetch or cache token
       const token = await getToken();
       const ticketPrice = checkEmailDomain(internalSchema.email);
+      const concept = checkDomainConcept(internalSchema.email);
 
       // Prepare payload for the API request
       const payload = {
         reference: 21,
-        concept: `${internalSchema.numberOfTickets} boletos rifa Calten`,
+        concept: concept,
         amount: internalSchema.numberOfTickets * ticketPrice,
         paymentLimitDate: 1,
         callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
