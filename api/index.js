@@ -84,7 +84,6 @@ app.post(
         reference: 21,
         concept: concept,
         amount: internalSchema.numberOfTickets * ticketPrice,
-        paymentLimitDate: 1,
         callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
         urlSuccess: `${process.env.RAFFLEFRONTEND}/success?name=${stringName}&email=${internalSchema.email}`,
         urlFailure: `${process.env.RAFFLEFRONTEND}?name=${stringName}&email=${internalSchema.email}&tickets=${internalSchema.numberOfTickets}&error=Hubo%20un%20error%20en%20tu%20pago,%20vuelve%20a%20intentarlo`
