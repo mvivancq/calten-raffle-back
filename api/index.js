@@ -204,9 +204,9 @@ app.post(
         reference: 21,
         concept: "pago de mercado",
         amount: internalSchema.amount,
-        //callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
-        urlSuccess: `test/success`,
-        urlFailure: `test/failure`
+        callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
+        urlSuccess: `${process.env.RAFFLEBACKEND}/success`,
+        urlFailure: `${process.env.RAFFLEBACKEND}/failure`
       };
 
       // Make the request to the external API
