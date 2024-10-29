@@ -15,7 +15,7 @@ import {
 import {
   validate as validateGoceryPayment,
   exposedSchema as exposedSchemaGoceryPayment,
-  mapToInternalSchema as mapToInternalSchemaPGoceryPayment,
+  mapToInternalSchema as mapToInternalSchemaGoceryPayment,
 } from "./Shemas/schemaGroceryPayment.js";
 import axios from "axios";
 import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
@@ -194,7 +194,7 @@ app.post(
   async (req, res) => {
     try {
       const incomingExposedSchema = req.body;
-      const internalSchema = mapToInternalSchemaPGoceryPayment(incomingExposedSchema);
+      const internalSchema = mapToInternalSchemaGoceryPayment(incomingExposedSchema);
       
       // Fetch or cache token
       const token = await getToken();
