@@ -12,6 +12,11 @@ import {
   exposedSchema as exposedSchemaPostPaymentResult,
   mapToInternalSchema as mapToInternalSchemaPostPaymentResult,
 } from "./Shemas/schemaPostPaymentResult.js";
+import {
+  validate as validateGoceryPayment,
+  exposedSchema as exposedSchemaGoceryPayment,
+  mapToInternalSchema as mapToInternalSchemaGoceryPayment,
+} from "./Shemas/schemaGroceryPayment.js";
 import axios from "axios";
 import { savePaymentReference, putPaymentResult } from "./utils/databaseStorage.js";
 import { sendCaltenEmail } from "./utils/emailSender.js";
@@ -174,6 +179,49 @@ app.post(
       res.send(response);
     } catch (err) {
       logger.error('Error processing payment result', err);
+      const result = {
+        requestStatus: 500,
+        statusMessage: 'Internal server error'
+      };
+      res.status(500).json(result);
+    }
+  }
+);
+
+app.post(
+  "/api/postGroceryPayment",
+  validateGoceryPayment(exposedSchemaGoceryPayment),
+  async (req, res) => {
+    try {
+      const incomingExposedSchema = req.body;
+      const internalSchema = mapToInternalSchemaGoceryPayment(incomingExposedSchema);
+      
+      // Fetch or cache token
+      const token = await getToken();
+
+      // Prepare payload for the API request
+      const payload = {
+        reference: 21,
+        concept: "pago de mercado",
+        amount: internalSchema.amount,
+        callback: `${process.env.RAFFLEBACKEND}/api/postPaymentResult`,
+        urlSuccess: `${process.env.RAFFLEBACKEND}/success`,
+        urlFailure: `${process.env.RAFFLEBACKEND}/failure`
+      };
+
+      // Make the request to the external API
+      const api = process.env.CALTENAPI + constants.caltenApis.createRequest;
+      const { data: result } = await axios.post(api, payload, {
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+          'authorization': `Bearer ${token}`
+        }
+      });
+
+      // Respond with the payment ID
+      res.send({ paymentId: result.data.id });
+    } catch (err) {
+      logger.error('Error creating the payment', err);
       const result = {
         requestStatus: 500,
         statusMessage: 'Internal server error'
