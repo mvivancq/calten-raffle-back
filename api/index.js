@@ -221,12 +221,24 @@ app.post(
       // Respond with the payment ID
       res.send({ paymentId: result.data.id });
     } catch (err) {
-      logger.error('Error creating the payment', err);
-      const result = {
-        requestStatus: 500,
-        statusMessage: 'Internal server error'
-      };
-      res.status(500).json(result);
+      if (axios.isAxiosError(err)) {
+        logger.error('Error creating the payment', {
+          message: err.message,
+          status: err.response?.status,
+          data: err.response?.data,
+        });
+
+        res.status(err.response?.status || 500).json({
+          requestStatus: err.response?.status || 500,
+          statusMessage: err.response?.data?.message || 'Internal server error',
+        });
+      } else {
+        logger.error('Unknown error creating the payment', err);
+        res.status(500).json({
+          requestStatus: 500,
+          statusMessage: 'Unexpected internal error',
+        });
+      }
     }
   }
 );
