@@ -1,7 +1,7 @@
 export const constants = {
     ticketPrice: 20,
     caltenApis:{
-        createRequest: "/api/createPrivateRequest"
+        createRequest: "/createPrivateRequest"
     },
     emails: [
         {
